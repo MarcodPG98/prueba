@@ -28,6 +28,23 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        $rules = [
+            'reference' => 'max:20|required',
+            'name' => 'required',
+            'description' => 'required',
+            'price' => 'required'
+        ];
+        $messages = [
+            'required' => 'El campo :attribute es obligatorio.',
+            'max' => 'Ha sobre pasado la longitud máxima del campo :attribute'
+        ];
+        $validator = Validator::make($request->all(), $rules, $messages);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => "Información incompleta o inválida -> ".$validator->messages()->first()
+            ], 400);
+        }
+        
         $product = Product::create($request->all());
 
         return response()->json([

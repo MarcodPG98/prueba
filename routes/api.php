@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,9 +24,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group([
 ], function ($router) {
     Route::apiResource('products', ProductController::class);
-});
-
-Route::group([
-], function ($router) {
-    Route::apiResource('clients', ClientController::class);
+    Route::apiResource('orders', OrderController::class);
 });

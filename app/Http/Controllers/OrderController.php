@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\OrderDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -15,6 +17,7 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::all();
+        //$orders = Order::with('order_detail')->get();
         return response()->json([
             'orders' => $orders
         ]);
@@ -28,12 +31,22 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        $order = Order::create($request->all());
-        $order->products()->sync($request->input('products', []));
-        return response()->json([
-            'message' => "Order saved successfully!",
-            'order' => $order
-        ], 200);
+        try{
+            DB::beginTransaction();
+            $order = Order::create($request->all());
+            $order->order_detail()->sync($request->input('order_detail', []));
+            DB::commit(); // Tell Laravel this transacion's all good and it can persist to DB
+            return response()->json([
+                'message' => "Order saved successfully!",
+                'order' => $order
+            ], 200);
+        }catch(\Exception $epx){
+            DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
+            return response([
+                'message' => $exp->getMessage(),
+                'status' => 'failed'
+            ], 400);
+        }
     }
 
     /**
@@ -42,9 +55,15 @@ class OrderController extends Controller
      * @param  \App\Models\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function show(Order $order)
+    public function show($id)
     {
-        //
+        $order = Order::find($id);
+        $detail = OrderDetail::where('order_id', $id)->get();
+        $order->order_detail = $detail;
+        return response()->json([
+            'message' => "Order found!",
+            'order' => $order
+        ], 200);
     }
 
     /**

@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id('order_id');
             $table->string('customer_name');
             $table->string('customer_email')->nullable();
-            $table->tinyinteger('status_id')->default(1);
-            $table->datetime('created_at')->useCurrent();
+            $table->tinyinteger('status_id')->default(1); // valor por defecto 1
+            $table->datetime('created_at')->useCurrent(); // valor por defecto
             $table->datetime('updated_at')->nullable();
         });
     }

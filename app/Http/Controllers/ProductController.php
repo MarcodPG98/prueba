@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
@@ -39,14 +41,14 @@ class ProductController extends Controller
             'max' => 'Ha sobre pasado la longitud máxima del campo :attribute'
         ];
         $validator = Validator::make($request->all(), $rules, $messages);
+        
         if ($validator->fails()) {
             return response()->json([
                 'message' => "Información incompleta o inválida -> ".$validator->messages()->first()
             ], 400);
         }
-        
-        $product = Product::create($request->all());
 
+        $product = Product::create($request->all());
         return response()->json([
             'message' => "Product saved successfully!",
             'product' => $product
@@ -58,9 +60,13 @@ class ProductController extends Controller
      * @param \App\Models\Product $product
      * @return \Illuminate\Http\Response
      */
-    public function show(Product $product)
+    public function show($product_id)
     {
-        //
+        $product = Product::find($product_id);
+        return response()->json([
+            'message' => "Data obtained!",
+            'product' => $product
+        ], 200);
     }
 
     /**
